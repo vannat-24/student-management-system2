@@ -1,44 +1,29 @@
-<!-- layouts/default.vue -->
+<!-- layouts/dashboard.vue -->
 <script setup lang="ts">
 import Sidebar from '~/components/Sidebar.vue'
 import Navbar from '~/components/Navbar.vue'
 
-const { user, currentRole, isAdmin, isTeacher, isStudent, canSwitchRoles } = useAuth()
+const { user, isAdmin, isTeacher, isStudent, canSwitchRoles } = useAuth()
 const { classInfo } = useScore()
 const { t } = useI18n()
 const route = useRoute()
 
 const isMobileSidebarOpen = ref(false)
 
-// Determine if sidebar should be shown:
-// - Admin and Teacher: ALWAYS Sidebar on Left, Content on Right!
-// - Student: Standalone view (or sidebar if navigating dashboard).
+// All dashboard roles (Admin, Teacher, Student) now use the Left Sidebar
 const showSidebar = computed(() => {
-  // If user is Admin or Teacher -> ALWAYS show Left Sidebar layout
-  if (isAdmin.value || isTeacher.value || canSwitchRoles.value) {
-    return true
-  }
-
-  // If on dashboard (/ or /admin or /teacher)
-  if (route.path === '/' || route.path.startsWith('/admin') || route.path.startsWith('/teacher')) {
-    return true
-  }
-
-  // Student on student page
-  if (isStudent.value && route.path.startsWith('/student')) {
-    return false
-  }
-
   return true
 })
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-100/70 text-slate-800 antialiased" dir="ltr">
-    <!-- LAYOUT WITH SIDEBAR (Admin & Teacher Views) -->
+  <div class="min-h-screen bg-[#f8fafc] text-slate-800 antialiased" dir="ltr">
+    <!-- ========================================================= -->
+    <!-- 1. LAYOUT WITH SIDEBAR (All Dashboard Views: Sidebar on Left) -->
+    <!-- ========================================================= -->
     <div v-if="showSidebar" class="min-h-screen flex flex-row w-full">
       <!-- Desktop Left Sidebar (>= md) -->
-      <aside class="hidden md:flex flex-col w-64 shrink-0 z-30 bg-white border-r border-slate-200 h-screen sticky top-0 left-0">
+      <aside class="hidden md:flex flex-col w-64 shrink-0 z-30 bg-white border-r border-slate-200/80 h-screen sticky top-0 left-0">
         <Sidebar />
       </aside>
 
@@ -73,12 +58,12 @@ const showSidebar = computed(() => {
         <!-- Top Companion Header Bar -->
         <Navbar :has-sidebar="true" @toggle-sidebar="isMobileSidebarOpen = !isMobileSidebarOpen" />
 
-        <!-- Page Slot -->
+        <!-- Page Content: Full-width without max-w-7xl capping -->
         <main class="flex-1 w-full p-4 sm:p-6 lg:p-8">
           <slot />
         </main>
 
-        <!-- Global Footer -->
+        <!-- Footer -->
         <footer class="no-print border-t border-slate-200/80 bg-white py-4 text-center text-xs text-slate-500 mt-auto">
           <div class="w-full px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
             <div class="flex items-center gap-2">
@@ -96,18 +81,20 @@ const showSidebar = computed(() => {
       </div>
     </div>
 
-    <!-- STANDALONE NAVBAR LAYOUT (Student Only) -->
-    <div v-else class="min-h-screen flex flex-col">
+    <!-- ========================================================= -->
+    <!-- 2. STANDALONE NAVBAR LAYOUT -->
+    <!-- ========================================================= -->
+    <div v-else class="min-h-screen flex flex-col w-full">
       <!-- Full Top Navbar -->
       <Navbar :has-sidebar="false" />
 
-      <!-- Page Slot -->
+      <!-- Page Content: Full-width -->
       <main class="flex-1 w-full p-4 sm:p-6 lg:p-8">
         <slot />
       </main>
 
       <!-- Global Footer -->
-      <footer class="no-print border-t border-slate-200/80 bg-white py-4 text-center text-xs text-slate-500">
+      <footer class="no-print border-t border-slate-200/80 bg-white py-4 text-center text-xs text-slate-500 mt-auto">
         <div class="w-full px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded bg-emerald-500"></span>

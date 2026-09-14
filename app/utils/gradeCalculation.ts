@@ -1,15 +1,46 @@
-import type { RawStudent, ComputedStudent, SubjectScores, GradeLetter } from '~/types'
+// utils/gradeCalculation.ts
+import type { RawStudent, ComputedStudent, SubjectScores, GradeLetter, ClassSubjectConfig } from '~/types'
+
 /**
- * ១. គណនាពិន្ទុសរុបពីមុខវិជ្ជាទាំង ៦
+ * ១. គណនាពិន្ទុសរុបពីមុខវិជ្ជា
  */
-export const calculateTotalScore = (scores: SubjectScores): number => {   
+export const calculateTotalScore = (scores: SubjectScores, subjectConfigs?: ClassSubjectConfig[]): number => {
+  if (subjectConfigs && subjectConfigs.length > 0) {
+    const activeConfigs = subjectConfigs.filter(s => s.enabled)
+    if (activeConfigs.length > 0) {
+      return activeConfigs.reduce((sum, config) => {
+        const score = Number(scores[config.key]) || 0
+        return sum + score
+      }, 0)
+    }
+  }
   const values = Object.values(scores)
   return values.reduce((sum, score) => sum + (Number(score) || 0), 0)
 }
+
 /**
- * ២. គណនាមធ្យមភាគ (ពិន្ទុសរុបចែកនឹងចំនួនមុខវិជ្ជា)
+ * ២. គណនាមធ្យមភាគដោយគិតមេគុណ (Weighted Average calculation)
+ * Formula: sum(score * coefficient) / sum(coefficient)
  */
-export const calculateAverageScore = (scores: SubjectScores): number => {
+export const calculateAverageScore = (scores: SubjectScores, subjectConfigs?: ClassSubjectConfig[]): number => {
+  if (subjectConfigs && subjectConfigs.length > 0) {
+    const activeConfigs = subjectConfigs.filter(s => s.enabled)
+    if (activeConfigs.length > 0) {
+      const totalWeightedScore = activeConfigs.reduce((sum, config) => {
+        const score = Number(scores[config.key]) || 0
+        const coef = Number(config.coefficient) || 1
+        return sum + (score * coef)
+      }, 0)
+
+      const totalCoefficients = activeConfigs.reduce((sum, config) => {
+        return sum + (Number(config.coefficient) || 1)
+      }, 0)
+
+      if (totalCoefficients === 0) return 0
+      return Number((totalWeightedScore / totalCoefficients).toFixed(2))
+    }
+  }
+
   const total = calculateTotalScore(scores)
   const subjectCount = Object.keys(scores).length
   if (subjectCount === 0) return 0
@@ -34,11 +65,14 @@ export const calculateGradeLetter = (average: number): GradeLetter => {
 /**
  * ៤. គណនាទិន្នន័យសរុប និងតម្រៀបចំណាត់ថ្នាក់ (Rank) សម្រាប់បញ្ជីសិស្សទាំងអស់
  */
-export const computeStudentsGrades = (students: RawStudent[]): ComputedStudent[] => {
+export const computeStudentsGrades = (
+  students: RawStudent[],
+  subjectConfigs?: ClassSubjectConfig[]
+): ComputedStudent[] => {
   // ជំហានទី ១៖ គណនា Total, Average, Grade សម្រាប់សិស្សម្នាក់ៗ
   const calculatedList = students.map((student) => {
-    const total = calculateTotalScore(student.scores)
-    const average = calculateAverageScore(student.scores)
+    const total = calculateTotalScore(student.scores, subjectConfigs)
+    const average = calculateAverageScore(student.scores, subjectConfigs)
     const grade = calculateGradeLetter(average)
 
     return {
@@ -46,7 +80,7 @@ export const computeStudentsGrades = (students: RawStudent[]): ComputedStudent[]
       total,
       average,
       grade,
-      rank: 0 // ទុកដាក់ចំណាត់ថ្នាក់នៅជំហានបន្ទាប់
+      rank: 0
     }
   })
 

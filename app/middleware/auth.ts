@@ -2,7 +2,7 @@
 import { useAuth } from '~/composables/useAuth'
 
 export default defineNuxtRouteMiddleware((to, from) => {
-  const { user, isAuthenticated, isAdmin, isTeacher, isStudent, initAuth } = useAuth()
+  const { user, isAuthenticated, isAdmin, isTeacher, isStudent, canSwitchRoles, initAuth } = useAuth()
 
   // Ensure auth is initialized from storage on client side
   if (process.client) {
@@ -20,13 +20,13 @@ export default defineNuxtRouteMiddleware((to, from) => {
     return
   }
 
-  // 2. If authenticated user tries to access /auth/login or /auth/register, redirect to their home dashboard
+  // 2. If authenticated user tries to access /auth/login or /auth/register, redirect to their role home dashboard
   if (isAuthRoute) {
     if (isAdmin.value) {
-      return navigateTo('/admin')
+      return navigateTo('/admin/class')
     }
     if (isTeacher.value) {
-      return navigateTo('/gradebook')
+      return navigateTo('/teacher')
     }
     if (isStudent.value) {
       return navigateTo('/student')
@@ -34,18 +34,36 @@ export default defineNuxtRouteMiddleware((to, from) => {
     return navigateTo('/')
   }
 
-  // 3. Role-Based Route Guarding
-  // Student role restrictions: cannot access /admin or /gradebook
-  if (isStudent.value) {
-    if (to.path.startsWith('/admin') || to.path.startsWith('/gradebook')) {
+  // Admin users can access all dashboard routes
+  if (canSwitchRoles.value || isAdmin.value) {
+    if (to.path === '/') {
+      return navigateTo('/admin/class')
+    }
+    return
+  }
+
+  // Handle root '/' for Teacher and Student
+  if (to.path === '/') {
+    if (isTeacher.value) {
+      return navigateTo('/teacher')
+    }
+    if (isStudent.value) {
       return navigateTo('/student')
     }
   }
 
-  // Teacher role restrictions: cannot access /admin
+  // 3. Role-Based Route Guarding for regular users
+  // Student role restrictions: can only access /student routes
+  if (isStudent.value) {
+    if (to.path.startsWith('/admin') || to.path.startsWith('/teacher')) {
+      return navigateTo('/student')
+    }
+  }
+
+  // Teacher role restrictions: can only access /teacher routes (cannot access /admin/class or /admin)
   if (isTeacher.value) {
     if (to.path.startsWith('/admin')) {
-      return navigateTo('/gradebook')
+      return navigateTo('/teacher')
     }
   }
 })
