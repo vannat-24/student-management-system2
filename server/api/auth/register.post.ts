@@ -1,7 +1,4 @@
 // server/api/auth/register.post.ts
-import fs from 'node:fs'
-import path from 'node:path'
-
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
@@ -17,16 +14,7 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    const dbPath = path.resolve(process.cwd(), 'app/api/db.json')
-    const usersPath = path.resolve(process.cwd(), 'app/api/users.json')
-    const studentsPath = path.resolve(process.cwd(), 'app/api/students.json')
-
-    let db: any = { classInfo: {}, students: [], classes: [], users: [] }
-    if (fs.existsSync(dbPath)) {
-      const rawData = fs.readFileSync(dbPath, 'utf-8')
-      db = JSON.parse(rawData)
-    }
-
+    const db = getDatabase()
     if (!Array.isArray(db.users)) db.users = []
     if (!Array.isArray(db.students)) db.students = []
 
@@ -36,7 +24,7 @@ export default defineEventHandler(async (event) => {
 
     const userEmail = (email || '').trim() || `${trimmedName.toLowerCase().replace(/\s+/g, '')}.${studentId.toLowerCase()}@school.edu.kh`
 
-    // 1. Create new User Object for JSON Database
+    // 1. Create new User Object for Database
     const newUser = {
       id: studentId,
       name: trimmedName,
@@ -71,22 +59,12 @@ export default defineEventHandler(async (event) => {
       remarks: 'សិស្សទើបចុះឈ្មោះថ្មី'
     }
 
-    // Add to in-memory arrays
+    // Add to in-memory / storage
     db.users.push(newUser)
     db.students.push(newStudent)
 
-    // Save back to app/api/db.json
-    fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8')
-
-    // Also update app/api/users.json if it exists
-    if (fs.existsSync(usersPath)) {
-      fs.writeFileSync(usersPath, JSON.stringify(db.users, null, 2), 'utf-8')
-    }
-
-    // Also update app/api/students.json if it exists
-    if (fs.existsSync(studentsPath)) {
-      fs.writeFileSync(studentsPath, JSON.stringify({ success: true, classInfo: db.classInfo, students: db.students }, null, 2), 'utf-8')
-    }
+    // Save safely
+    saveDatabase(db)
 
     const sessionUser = {
       id: newUser.id,
@@ -110,7 +88,7 @@ export default defineEventHandler(async (event) => {
   } catch (err: any) {
     return {
       success: false,
-      message: err?.message || 'Failed to register student into JSON database'
+      message: err?.message || 'Failed to register student into database'
     }
   }
 })

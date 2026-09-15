@@ -292,7 +292,7 @@ export const useAuth = () => {
     }
   }
 
-  // Real JSON Database Login (Compares credentials against app/api/db.json)
+  // Real JSON Database Login (Compares credentials against database with client-side fallback)
   const loginWithApi = async (username: string, password: string) => {
     try {
       const response = await $fetch<{
@@ -317,6 +317,12 @@ export const useAuth = () => {
           redirect: response.redirect || '/student',
           user: response.user
         }
+      }
+
+      // If server returned false or an error message (like db missing), fallback to client-side login
+      const fallbackResult = loginWithPassword(password, username)
+      if (fallbackResult.success) {
+        return fallbackResult
       }
 
       return {

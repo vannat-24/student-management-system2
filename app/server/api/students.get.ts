@@ -1,14 +1,10 @@
 // app/server/api/students.get.ts
-import fs from 'node:fs'
-import path from 'node:path'
 import type { StudentsApiResponse } from '~/types'
 
 export default defineEventHandler(async (event): Promise<StudentsApiResponse> => {
   try {
-    const dbPath = path.resolve(process.cwd(), 'app/api/db.json')
-    if (fs.existsSync(dbPath)) {
-      const rawData = fs.readFileSync(dbPath, 'utf-8')
-      const db = JSON.parse(rawData)
+    const db = getDatabase()
+    if (db) {
       return {
         success: true,
         classInfo: db.classInfo || {
@@ -18,16 +14,16 @@ export default defineEventHandler(async (event): Promise<StudentsApiResponse> =>
           isLocked: false,
           month: 'តុលា (October)'
         },
-        students: db.students || [],
-        classes: db.classes || [],
-        subjects: db.subjects || [],
-        announcements: db.announcements || [],
-        schedule: db.schedule || [],
-        attendanceLogs: db.attendanceLogs || []
+        students: Array.isArray(db.students) ? db.students : [],
+        classes: Array.isArray(db.classes) ? db.classes : [],
+        subjects: Array.isArray(db.subjects) ? db.subjects : [],
+        announcements: Array.isArray(db.announcements) ? db.announcements : [],
+        schedule: Array.isArray(db.schedule) ? db.schedule : [],
+        attendanceLogs: Array.isArray(db.attendanceLogs) ? db.attendanceLogs : []
       }
     }
   } catch (err) {
-    console.error('Error reading students from db.json:', err)
+    console.error('Error reading students from database:', err)
   }
 
   return {
@@ -39,6 +35,15 @@ export default defineEventHandler(async (event): Promise<StudentsApiResponse> =>
       isLocked: false,
       month: 'តុលា (October)'
     },
-    students: []
+    students: [
+      {
+        id: 'STU-001',
+        name: 'សុខ ហេង',
+        gender: 'M',
+        dob: '2008-05-12',
+        scores: { math: 88, physics: 82, chemistry: 85, biology: 80, khmer: 92, english: 90 },
+        remarks: 'រៀនពូកែ យកចិត្តទុកដាក់ និងមានវិន័យល្អណាស់'
+      }
+    ]
   }
 })

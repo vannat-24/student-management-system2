@@ -1,7 +1,4 @@
 // server/api/auth/update-password.post.ts
-import fs from 'node:fs'
-import path from 'node:path'
-
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
@@ -15,16 +12,7 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    const dbPath = path.resolve(process.cwd(), 'app/api/db.json')
-    if (!fs.existsSync(dbPath)) {
-      return {
-        success: false,
-        message: 'Database file not found'
-      }
-    }
-
-    const rawData = fs.readFileSync(dbPath, 'utf-8')
-    const db = JSON.parse(rawData)
+    const db = getDatabase()
     if (!Array.isArray(db.users)) {
       db.users = []
     }
@@ -56,7 +44,8 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8')
+    // Persist to disk if writable, and update in-memory cache
+    saveDatabase(db)
 
     return {
       success: true,
