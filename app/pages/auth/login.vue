@@ -9,7 +9,8 @@ import {
   Briefcase,
   AlertCircle,
   CheckCircle2,
-  ArrowRight
+  ArrowRight,
+  Clock
 } from 'lucide-vue-next'
 
 definePageMeta({
@@ -25,10 +26,12 @@ const username = ref('')
 const password = ref('')
 const isLoading = ref(false)
 const errorMessage = ref('')
+const isPendingWarning = ref(false)
 const successRoleMessage = ref<string | null>(null)
 
 const handleLogin = async () => {
   errorMessage.value = ''
+  isPendingWarning.value = false
   successRoleMessage.value = null
 
   const pwd = password.value.trim()
@@ -50,6 +53,7 @@ const handleLogin = async () => {
       router.push(result.redirect!)
     }, 250)
   } else {
+    isPendingWarning.value = !!result.isPending
     errorMessage.value = result.message || 'Invalid username or password.'
   }
 }
@@ -77,9 +81,21 @@ const fillDemoAccount = (uname: string, pwd: string) => {
       </p>
     </div>
 
-    <!-- Error Alert -->
+    <!-- Pending Approval Alert -->
     <div
-      v-if="errorMessage"
+      v-if="errorMessage && isPendingWarning"
+      class="mb-3.5 p-3 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-2.5 leading-relaxed shadow-2xs"
+    >
+      <Clock class="w-4 h-4 shrink-0 text-amber-600 mt-0.5 animate-pulse" />
+      <div>
+        <div class="font-bold text-[11px] uppercase tracking-wider text-amber-700">គណនីរង់ចាំការអនុម័ត (Pending Approval)</div>
+        <div class="mt-0.5 text-xs text-slate-700">{{ errorMessage }}</div>
+      </div>
+    </div>
+
+    <!-- General Error Alert -->
+    <div
+      v-else-if="errorMessage"
       class="mb-3.5 p-2.5 text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg flex items-center gap-2"
     >
       <AlertCircle class="w-4 h-4 shrink-0 text-rose-600" />

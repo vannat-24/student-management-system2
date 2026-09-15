@@ -222,34 +222,6 @@ const standaloneNavItems = computed<NavItem[]>(() => [
               <span class="hidden sm:inline">{{ isLocked ? t('locked') : t('unlocked') }}</span>
             </div>
 
-            <!-- Language Selector -->
-            <div class="flex items-center border border-slate-200 rounded-xl p-0.5 bg-slate-50 text-xs">
-              <button
-                type="button"
-                @click="setLocale('en')"
-                :class="[
-                  'px-2 py-0.5 text-[11px] font-bold rounded-lg transition cursor-pointer',
-                  isEnglish
-                    ? 'bg-white text-indigo-700 shadow-xs'
-                    : 'text-slate-500 hover:text-slate-800'
-                ]"
-              >
-                EN
-              </button>
-              <button
-                type="button"
-                @click="setLocale('km')"
-                :class="[
-                  'px-2 py-0.5 text-[11px] font-bold rounded-lg transition cursor-pointer',
-                  isKhmer
-                    ? 'bg-white text-indigo-700 shadow-xs'
-                    : 'text-slate-500 hover:text-slate-800'
-                ]"
-              >
-                ខ្មែរ
-              </button>
-            </div>
-
             <!-- Fixed Role Badge for Authenticated User -->
             <div v-if="isAuthenticated && user" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-slate-100/90 rounded-xl border border-slate-200 text-xs font-semibold">
               <span v-if="isAdmin" class="flex items-center gap-1.5 text-purple-700">

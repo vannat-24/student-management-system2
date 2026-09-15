@@ -1870,6 +1870,38 @@
       "teacherId": "TEA-006",
       "teacherName": "អ្នកគ្រូ គន្ធា (Ms. Kunthea)",
       "password": "student123"
+    },
+    {
+      "id": "STU-123",
+      "name": "សេរី រតន",
+      "email": "សេរីរតន.stu-123@school.edu.kh",
+      "role": "student",
+      "studentId": "STU-123",
+      "classId": "CLS-12A",
+      "className": "ថ្នាក់ទី ១២A (Class 12A)",
+      "teacherId": "TEA-001",
+      "teacherName": "លោកគ្រូ សុវណ្ណ (Mr. Sovann)",
+      "gender": "M",
+      "dob": "2008-01-01",
+      "password": "student123",
+      "status": "approved",
+      "createdAt": "2026-09-15T03:14:22.631Z"
+    },
+    {
+      "id": "STU-124",
+      "name": "ទេព វាសនា",
+      "email": "ទេពវាសនា.stu-124@school.edu.kh",
+      "role": "student",
+      "studentId": "STU-124",
+      "classId": "CLS-10B",
+      "className": "ថ្នាក់ទី ១០B (Class 10B)",
+      "teacherId": "TEA-006",
+      "teacherName": "អ្នកគ្រូ គន្ធា (Ms. Kunthea)",
+      "gender": "M",
+      "dob": "2004-03-21",
+      "password": "student123",
+      "status": "rejected",
+      "createdAt": "2026-09-15T03:17:56.908Z"
     }
   ],
   "students": [
@@ -6630,6 +6662,26 @@
       "remarks": "សិស្សចូលរួមរៀនទៀងទាត់ និងមានអាកប្បកិរិយាល្អ",
       "program": "ចំណេះទូទៅ (General Track)",
       "gradeLevel": "ថ្នាក់ទី 10 (Grade 10)"
+    },
+    {
+      "id": "STU-123",
+      "name": "សេរី រតន",
+      "gender": "M",
+      "dob": "2008-01-01",
+      "classId": "CLS-12A",
+      "className": "ថ្នាក់ទី ១២A (Class 12A)",
+      "teacherId": "TEA-001",
+      "teacherName": "លោកគ្រូ សុវណ្ណ (Mr. Sovann)",
+      "status": "approved",
+      "scores": {
+        "math": 75,
+        "physics": 75,
+        "chemistry": 75,
+        "biology": 75,
+        "khmer": 75,
+        "english": 75
+      },
+      "remarks": "សិស្សទើបត្រូវបានអនុម័តដោយ Admin"
     }
   ],
   "subjects": [

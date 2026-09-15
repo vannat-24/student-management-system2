@@ -2,7 +2,7 @@
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
-    const { name, email, classId, className, teacherId, teacherName, password } = body || {}
+    const { name, email, classId, className, teacherId, teacherName, password, gender, dob } = body || {}
 
     const trimmedName = (name || '').trim()
     const trimmedPassword = (password || '').trim()
@@ -19,12 +19,12 @@ export default defineEventHandler(async (event) => {
     if (!Array.isArray(db.students)) db.students = []
 
     // Calculate next Student ID
-    const studentCount = db.students.length + 1
+    const studentCount = db.users.filter((u: any) => u.role === 'student').length + 1
     const studentId = `STU-${String(studentCount).padStart(3, '0')}`
 
     const userEmail = (email || '').trim() || `${trimmedName.toLowerCase().replace(/\s+/g, '')}.${studentId.toLowerCase()}@school.edu.kh`
 
-    // 1. Create new User Object for Database
+    // 1. Create new User Object with status: 'pending' (Awaiting Admin approval)
     const newUser = {
       id: studentId,
       name: trimmedName,
@@ -35,55 +35,29 @@ export default defineEventHandler(async (event) => {
       className: className || 'ថ្នាក់ទី ១២A (Class 12A)',
       teacherId: teacherId || 'TEA-001',
       teacherName: teacherName || 'លោកគ្រូ សុវណ្ណ (Mr. Sovann)',
-      password: trimmedPassword
+      gender: gender || 'M',
+      dob: dob || '2008-01-01',
+      password: trimmedPassword,
+      status: 'pending', // Pending approval by Admin
+      createdAt: new Date().toISOString()
     }
 
-    // 2. Create new Student Object for Scoreboard / Roster
-    const newStudent = {
-      id: studentId,
-      name: trimmedName,
-      gender: 'M',
-      dob: '2008-01-01',
-      classId: classId || 'CLS-12A',
-      className: className || 'ថ្នាក់ទី ១២A (Class 12A)',
-      teacherId: teacherId || 'TEA-001',
-      teacherName: teacherName || 'លោកគ្រូ សុវណ្ណ (Mr. Sovann)',
-      scores: {
-        math: 75,
-        physics: 75,
-        chemistry: 75,
-        biology: 75,
-        khmer: 75,
-        english: 75
-      },
-      remarks: 'សិស្សទើបចុះឈ្មោះថ្មី'
-    }
-
-    // Add to in-memory / storage
+    // Add only to users list with pending status (will be added to active students upon Admin approval)
     db.users.push(newUser)
-    db.students.push(newStudent)
 
-    // Save safely
+    // Save safely to database
     saveDatabase(db)
 
-    const sessionUser = {
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-      role: 'student',
-      primaryRole: 'student',
-      studentId: newUser.studentId,
-      classId: newUser.classId,
-      className: newUser.className,
-      teacherId: newUser.teacherId,
-      teacherName: newUser.teacherName
-    }
-
+    // Return success indicating approval is required; DO NOT return active login session
     return {
       success: true,
-      user: sessionUser,
-      redirect: '/student',
-      message: 'ចុះឈ្មោះជោគជ័យ! (Registration successful)'
+      requiresApproval: true,
+      studentId: studentId,
+      name: trimmedName,
+      classId: newUser.classId,
+      className: newUser.className,
+      teacherName: newUser.teacherName,
+      message: 'ការចុះឈ្មោះទទួលបានជោគជ័យ! គណនីរបស់អ្នកត្រូវបានបញ្ជូនទៅរង់ចាំការអនុញ្ញាត (Approval) ពី Admin មុនពេលចូលប្រើប្រាស់។'
     }
   } catch (err: any) {
     return {

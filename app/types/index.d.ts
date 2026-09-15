@@ -7,6 +7,7 @@ export interface User {
   id: string
   name: string
   role: UserRole
+  email?: string
   studentId?: string
   primaryRole?: UserRole
   classId?: string
@@ -14,6 +15,10 @@ export interface User {
   teacherId?: string
   teacherName?: string
   avatar?: string
+  status?: 'pending' | 'approved' | 'rejected'
+  createdAt?: string
+  gender?: 'M' | 'F'
+  dob?: string
 }
 
 // ២. មុខវិជ្ជាទាំង ៦ និងពិន្ទុ (Subject Scores)
@@ -37,6 +42,7 @@ export interface RawStudent {
   name: string
   gender: 'M' | 'F'
   dob: string
+  status?: 'pending' | 'approved' | 'rejected'
   scores: SubjectScores
   remarks?: string
   classId?: string

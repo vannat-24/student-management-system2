@@ -36,53 +36,53 @@ const route = useRoute()
 const menuItems = computed<StudentMenuItem[]>(() => [
   {
     id: 'dashboard',
-    title: isEnglish.value ? 'Dashboard' : 'ផ្ទាំងគ្រប់គ្រង',
+    title: 'Dashboard',
     to: '/student',
     icon: LayoutDashboard
   },
   {
     id: 'scores',
-    title: isEnglish.value ? 'My Scores' : 'ពិន្ទុរបស់ខ្ញុំ',
+    title: 'My Scores',
     to: '/student/scores',
     icon: TrendingUp
   },
   {
     id: 'subjects',
-    title: isEnglish.value ? 'Subjects' : 'មុខវិជ្ជា',
+    title: 'Subjects',
     to: '/student/subjects',
     icon: BookOpen
   },
   {
     id: 'attendance',
-    title: isEnglish.value ? 'Attendance' : 'វត្តមានសិស្ស',
+    title: 'Attendance',
     to: '/student/attendance',
     icon: CalendarCheck
   },
   {
     id: 'schedule',
-    title: isEnglish.value ? 'Schedule' : 'កាលវិភាគ',
+    title: 'Schedule',
     to: '/student/schedule',
     icon: CalendarDays
   },
   {
     id: 'announcements',
-    title: isEnglish.value ? 'Announcements' : 'សេចក្តីជូនដំណឹង',
+    title: 'Announcements',
     to: '/student/announcements',
     icon: Megaphone
   },
   {
     id: 'profile',
-    title: isEnglish.value ? 'Profile' : 'ប្រវត្តិរូប',
+    title: 'Profile',
     to: '/student/profile',
     icon: User
   }
 ])
 
 const isItemActive = (item: StudentMenuItem): boolean => {
-  if (item.to === '/student') {
+  if (item.id === 'dashboard' || item.to === '/student') {
     return route.path === '/student' || route.path === '/student/'
   }
-  return route.path.startsWith(item.to)
+  return route.path === item.to || route.path.startsWith(item.to + '/')
 }
 
 const handleLogout = () => {

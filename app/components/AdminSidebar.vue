@@ -10,7 +10,8 @@ import {
   CalendarDays,
   Megaphone,
   BarChart3,
-  KeyRound
+  KeyRound,
+  UserCheck
 } from 'lucide-vue-next'
 
 export interface AdminMenuItem {
@@ -19,6 +20,7 @@ export interface AdminMenuItem {
   to: string
   activePaths: string[]
   icon: any
+  badge?: number
 }
 
 const props = defineProps<{
@@ -31,63 +33,76 @@ const emit = defineEmits<{
 
 const { user, isAuthenticated, logout } = useAuth()
 const { t, isEnglish } = useI18n()
+const { pendingCount, fetchApprovals } = useApprovals()
 const router = useRouter()
 const route = useRoute()
+
+onMounted(() => {
+  fetchApprovals()
+})
 
 // Admin Menu List Definition
 const menuItems = computed<AdminMenuItem[]>(() => [
   {
     id: 'class',
-    title: isEnglish.value ? 'Classes' : 'ថ្នាក់រៀន',
+    title: 'Classes',
     to: '/admin/class',
     activePaths: ['/admin/class', '/admin'],
     icon: School
   },
   {
+    id: 'approvals',
+    title: 'Student Approvals',
+    to: '/admin/approvals',
+    activePaths: ['/admin/approvals'],
+    icon: UserCheck,
+    badge: pendingCount.value
+  },
+  {
     id: 'teacher',
-    title: isEnglish.value ? 'Faculty' : 'គ្រូបង្រៀន',
+    title: 'Faculty',
     to: '/admin/teacher',
     activePaths: ['/admin/teacher'],
     icon: GraduationCap
   },
   {
     id: 'schedule',
-    title: isEnglish.value ? 'Schedule' : 'កាលវិភាគ',
+    title: 'Schedule',
     to: '/admin/schedule',
     activePaths: ['/admin/schedule'],
     icon: CalendarDays
   },
   {
     id: 'student',
-    title: isEnglish.value ? 'Student Portal' : 'សិស្សានុសិស្ស',
+    title: 'Student Portal',
     to: '/admin/student',
-    activePaths: ['/admin/student', '/student'],
+    activePaths: ['/admin/student'],
     icon: User
   },
   {
     id: 'attendance',
-    title: isEnglish.value ? 'Attendance' : 'វត្តមានសិស្ស',
+    title: 'Attendance',
     to: '/admin/attendance',
     activePaths: ['/admin/attendance'],
     icon: CalendarCheck
   },
   {
     id: 'announcements',
-    title: isEnglish.value ? 'Announcements' : 'សេចក្តីជូនដំណឹង',
+    title: 'Announcements',
     to: '/admin/announcements',
     activePaths: ['/admin/announcements'],
     icon: Megaphone
   },
   {
     id: 'analytics',
-    title: isEnglish.value ? 'Analytics' : 'ស្ថិតិ និងរបាយការណ៍',
+    title: 'Analytics',
     to: '/admin/analytics',
     activePaths: ['/admin/analytics'],
     icon: BarChart3
   },
   {
     id: 'passwords',
-    title: isEnglish.value ? 'Password Manager' : 'គ្រប់គ្រងលេខសម្ងាត់',
+    title: 'Password Manager',
     to: '/admin/passwords',
     activePaths: ['/admin/passwords', '/admin/security'],
     icon: KeyRound
@@ -95,7 +110,13 @@ const menuItems = computed<AdminMenuItem[]>(() => [
 ])
 
 const isItemActive = (item: AdminMenuItem): boolean => {
-  return item.activePaths.some(p => route.path === p || (p !== '/' && route.path.startsWith(p)))
+  if (item.id === 'class' || item.to === '/admin/class') {
+    return route.path === '/admin/class' || route.path === '/admin' || route.path === '/admin/'
+  }
+  if (item.id === 'student') {
+    return route.path === '/admin/student' || route.path.startsWith('/admin/student/')
+  }
+  return route.path === item.to || route.path.startsWith(item.to + '/')
 }
 
 const handleLogout = () => {
@@ -168,7 +189,13 @@ const handleNavClick = () => {
             :class="{ '!text-purple-600': isItemActive(item) }"
           />
           <span class="flex-1">{{ item.title }}</span>
-          <span v-if="isItemActive(item)" class="w-1.5 h-1.5 rounded-full bg-purple-600"></span>
+          <span
+            v-if="item.badge && item.badge > 0"
+            class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-500 text-white shadow-xs animate-pulse"
+          >
+            {{ item.badge }}
+          </span>
+          <span v-else-if="isItemActive(item)" class="w-1.5 h-1.5 rounded-full bg-purple-600"></span>
         </NuxtLink>
       </nav>
     </div>

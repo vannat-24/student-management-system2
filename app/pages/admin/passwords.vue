@@ -16,7 +16,8 @@ import {
   Edit,
   Save,
   X,
-  AlertCircle
+  AlertCircle,
+  Clock
 } from 'lucide-vue-next'
 
 definePageMeta({
@@ -34,6 +35,11 @@ const {
   resetUserPassword
 } = useAuth()
 const { teachers, classes, allComputedStudents } = useScore()
+const { pendingCount, fetchApprovals } = useApprovals()
+
+onMounted(() => {
+  fetchApprovals()
+})
 
 // Active Tab: 'teachers' | 'students' | 'roles'
 const activeTab = ref<'teachers' | 'students' | 'roles'>('teachers')
@@ -325,6 +331,17 @@ const filteredStudents = computed(() => {
           <User class="w-4 h-4" />
           <span>{{ isEnglish ? 'Students' : 'សិស្សានុសិស្ស' }} ({{ allComputedStudents.length }})</span>
         </button>
+
+        <NuxtLink
+          to="/admin/approvals"
+          class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200 cursor-pointer"
+        >
+          <Clock class="w-4 h-4 text-amber-600" />
+          <span>{{ isEnglish ? 'Registration Approvals' : 'ការអនុម័តសិស្ស' }}</span>
+          <span v-if="pendingCount > 0" class="px-1.5 py-0.2 rounded-full bg-amber-500 text-white text-[10px] font-black animate-pulse">
+            {{ pendingCount }}
+          </span>
+        </NuxtLink>
       </div>
 
       <!-- Search & Class Filter -->

@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Load database safely using server/utils/db.ts (works on local, Vercel, Netlify, Render, Docker)
+    // Load database safely using server/utils/db.ts
     const db = getDatabase()
     const users: any[] = Array.isArray(db?.users) ? db.users : []
 
@@ -73,7 +73,8 @@ export default defineEventHandler(async (event) => {
           id: 'ADM-001',
           name: 'គណៈគ្រប់គ្រង (Admin)',
           email: 'admin@school.edu.kh',
-          role: 'admin'
+          role: 'admin',
+          status: 'approved'
         }
       } else if (pwd === 'teacher123') {
         matchedUser =
@@ -84,12 +85,19 @@ export default defineEventHandler(async (event) => {
             email: 'sovann.teacher@school.edu.kh',
             role: 'teacher',
             classId: 'CLS-12A',
-            className: 'ថ្នាក់ទី ១២A'
+            className: 'ថ្នាក់ទី ១២A',
+            status: 'approved'
           }
       } else if (pwd === 'student123') {
         matchedUser =
-          users.find((u) => u.role === 'student' && (!uname || (u.id || '').toLowerCase() === uname || (u.email || '').toLowerCase().includes(uname))) ||
-          users.find((u) => u.role === 'student') || {
+          users.find(
+            (u) =>
+              u.role === 'student' &&
+              u.status !== 'pending' &&
+              u.status !== 'rejected' &&
+              (!uname || (u.id || '').toLowerCase() === uname || (u.email || '').toLowerCase().includes(uname))
+          ) ||
+          users.find((u) => u.role === 'student' && u.status !== 'pending' && u.status !== 'rejected') || {
             id: 'ST-2026-024',
             name: 'Siv Vannat',
             email: 'vannat.siv@school.edu.kh',
@@ -98,7 +106,8 @@ export default defineEventHandler(async (event) => {
             classId: 'CLS-12A',
             className: 'ថ្នាក់ទី ១២A (Class 12A)',
             teacherId: 'TEA-001',
-            teacherName: 'លោកគ្រូ សុវណ្ណ (Mr. Sovann)'
+            teacherName: 'លោកគ្រូ សុវណ្ណ (Mr. Sovann)',
+            status: 'approved'
           }
       } else {
         // Any custom user password in database
@@ -110,6 +119,27 @@ export default defineEventHandler(async (event) => {
       return {
         success: false,
         message: 'លេខសម្ងាត់ ឬ ឈ្មោះអ្នកប្រើប្រាស់មិនត្រឹមត្រូវទេ (Invalid username or password)'
+      }
+    }
+
+    // CHECK APPROVAL STATUS: Crucial check for student approval by Admin
+    if (matchedUser.status === 'pending') {
+      return {
+        success: false,
+        isPending: true,
+        studentId: matchedUser.id,
+        studentName: matchedUser.name,
+        message: 'គណនីរបស់អ្នកកំពុងរង់ចាំការអនុញ្ញាត (Pending Approval) ពី Admin នៅឡើយ។ សូមរង់ចាំការអនុម័ត ឬទាក់ទងរដ្ឋបាលសាលា។'
+      }
+    }
+
+    if (matchedUser.status === 'rejected') {
+      return {
+        success: false,
+        isRejected: true,
+        studentId: matchedUser.id,
+        studentName: matchedUser.name,
+        message: 'គណនីរបស់អ្នកត្រូវបានបដិសេធ (Rejected) ដោយ Admin។ សូមទាក់ទងរដ្ឋបាលសាលាដើម្បីសាកសួរព័ត៌មានបន្ថែម។'
       }
     }
 
@@ -128,7 +158,8 @@ export default defineEventHandler(async (event) => {
       classId: matchedUser.classId || 'CLS-12A',
       className: matchedUser.className || 'ថ្នាក់ទី ១២A (Class 12A)',
       teacherId: matchedUser.teacherId || 'TEA-001',
-      teacherName: matchedUser.teacherName || 'លោកគ្រូ សុវណ្ណ (Mr. Sovann)'
+      teacherName: matchedUser.teacherName || 'លោកគ្រូ សុវណ្ណ (Mr. Sovann)',
+      status: matchedUser.status || 'approved'
     }
 
     return {

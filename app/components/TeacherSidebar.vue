@@ -38,49 +38,49 @@ const route = useRoute()
 const menuItems = computed<TeacherMenuItem[]>(() => [
   {
     id: 'teacher',
-    title: isEnglish.value ? 'Gradebook' : 'សៀវភៅពិន្ទុ',
+    title: 'Gradebook',
     to: '/teacher',
     activePaths: ['/teacher', '/teacher/class', '/teacher/gradebook'],
     icon: GraduationCap
   },
   {
     id: 'student',
-    title: isEnglish.value ? 'Student Portal' : 'សិស្សានុសិស្ស',
+    title: 'Student Portal',
     to: '/teacher/student',
     activePaths: ['/teacher/student'],
     icon: User
   },
   {
     id: 'attendance',
-    title: isEnglish.value ? 'Attendance' : 'វត្តមានសិស្ស',
+    title: 'Attendance',
     to: '/teacher/attendance',
     activePaths: ['/teacher/attendance'],
     icon: CalendarCheck
   },
   {
     id: 'schedule',
-    title: isEnglish.value ? 'Schedule' : 'កាលវិភាគបង្រៀន',
+    title: 'Schedule',
     to: '/teacher/schedule',
     activePaths: ['/teacher/schedule'],
     icon: CalendarDays
   },
   {
     id: 'announcements',
-    title: isEnglish.value ? 'Announcements' : 'សេចក្តីជូនដំណឹង',
+    title: 'Announcements',
     to: '/teacher/announcements',
     activePaths: ['/teacher/announcements'],
     icon: Megaphone
   },
   {
     id: 'analytics',
-    title: isEnglish.value ? 'Analytics' : 'ស្ថិតិពិន្ទុ',
+    title: 'Analytics',
     to: '/teacher/analytics',
     activePaths: ['/teacher/analytics'],
     icon: BarChart3
   },
   {
     id: 'profile',
-    title: isEnglish.value ? 'Profile' : 'ប្រវត្តិរូប',
+    title: 'Profile',
     to: '/teacher/profile',
     activePaths: ['/teacher/profile'],
     icon: UserCircle
@@ -88,7 +88,10 @@ const menuItems = computed<TeacherMenuItem[]>(() => [
 ])
 
 const isItemActive = (item: TeacherMenuItem): boolean => {
-  return item.activePaths.some(p => route.path === p || (p !== '/' && route.path.startsWith(p)))
+  if (item.id === 'teacher' || item.to === '/teacher') {
+    return route.path === '/teacher' || route.path === '/teacher/' || route.path === '/teacher/class' || route.path === '/teacher/gradebook'
+  }
+  return route.path === item.to || route.path.startsWith(item.to + '/')
 }
 
 const handleLogout = () => {

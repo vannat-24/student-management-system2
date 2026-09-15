@@ -301,6 +301,8 @@ export const useAuth = () => {
         role?: UserRole
         redirect?: string
         message?: string
+        isPending?: boolean
+        isRejected?: boolean
       }>('/api/auth/login', {
         method: 'POST',
         body: { username, password }
@@ -316,6 +318,16 @@ export const useAuth = () => {
           role: response.role,
           redirect: response.redirect || '/student',
           user: response.user
+        }
+      }
+
+      // If user account is pending approval or rejected, DO NOT fallback to demo role login!
+      if (response.isPending || response.isRejected) {
+        return {
+          success: false,
+          isPending: response.isPending,
+          isRejected: response.isRejected,
+          message: response.message
         }
       }
 
@@ -344,10 +356,18 @@ export const useAuth = () => {
     teacherId?: string
     teacherName?: string
     email?: string
+    gender?: 'M' | 'F'
+    dob?: string
   }) => {
     try {
       const response = await $fetch<{
         success: boolean
+        requiresApproval?: boolean
+        studentId?: string
+        name?: string
+        classId?: string
+        className?: string
+        teacherName?: string
         user?: User
         redirect?: string
         message?: string
@@ -356,16 +376,32 @@ export const useAuth = () => {
         body: formData
       })
 
-      if (response.success && response.user) {
-        user.value = response.user
-        if (process.client) {
-          localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(response.user))
+      if (response.success) {
+        // If registration requires Admin approval, DO NOT auto-login or store session
+        if (response.requiresApproval) {
+          return {
+            success: true,
+            requiresApproval: true,
+            studentId: response.studentId,
+            name: response.name,
+            classId: response.classId,
+            className: response.className,
+            teacherName: response.teacherName,
+            message: response.message
+          }
         }
-        return {
-          success: true,
-          user: response.user,
-          redirect: response.redirect || '/student',
-          message: response.message
+
+        if (response.user) {
+          user.value = response.user
+          if (process.client) {
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(response.user))
+          }
+          return {
+            success: true,
+            user: response.user,
+            redirect: response.redirect || '/student',
+            message: response.message
+          }
         }
       }
 

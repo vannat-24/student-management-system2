@@ -17,7 +17,10 @@ import {
   AlertTriangle,
   X,
   Check,
-  Sparkles
+  Sparkles,
+  UserCheck,
+  Clock,
+  ArrowRight
 } from 'lucide-vue-next'
 
 definePageMeta({
@@ -39,7 +42,12 @@ const {
 } = useScore()
 
 const { rolePasswords, updateRolePasswords } = useAuth()
+const { pendingCount, fetchApprovals } = useApprovals()
 const { t } = useI18n()
+
+onMounted(() => {
+  fetchApprovals()
+})
 
 // Modals and state
 const showAddModal = ref(false)
@@ -153,6 +161,41 @@ const handleResetAll = async () => {
 
 <template>
   <div class="space-y-5">
+    <!-- Pending Approvals Alert Banner -->
+    <div
+      v-if="pendingCount > 0"
+      class="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl p-4 sm:p-5 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4"
+    >
+      <div class="flex items-center gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-white shrink-0">
+          <Clock class="w-5 h-5 animate-pulse" />
+        </div>
+        <div>
+          <div class="font-bold text-sm tracking-tight flex items-center gap-2">
+            <span>{{ isEnglish ? 'Student Registration Approvals Pending' : 'មានសិស្សចុះឈ្មោះថ្មីកំពុងរង់ចាំការអនុញ្ញាត' }}</span>
+            <span class="px-2 py-0.5 rounded-full bg-white text-amber-700 text-xs font-black">
+              {{ pendingCount }}
+            </span>
+          </div>
+          <p class="text-xs text-amber-100 mt-0.5">
+            {{ isEnglish
+              ? 'New student account(s) have registered and are waiting for your approval to access the portal.'
+              : 'មានគណនីសិស្សដែលទើបចុះឈ្មោះថ្មី កំពុងរង់ចាំការអនុញ្ញាត (Approval) ពី Admin មុនពេលពួកគេអាច Login ចូលប្រើប្រាស់បាន។'
+            }}
+          </p>
+        </div>
+      </div>
+
+      <NuxtLink
+        to="/admin/approvals"
+        class="px-4 py-2 bg-white text-amber-700 hover:bg-amber-50 font-bold text-xs rounded-xl shadow-xs transition shrink-0 flex items-center gap-1.5 cursor-pointer"
+      >
+        <UserCheck class="w-4 h-4" />
+        <span>{{ isEnglish ? 'Review & Approve' : 'ពិនិត្យ និងអនុញ្ញាត' }}</span>
+        <ArrowRight class="w-3.5 h-3.5" />
+      </NuxtLink>
+    </div>
+
     <!-- Admin Header & Control Center -->
     <div class="bg-white rounded-2xl p-5 shadow-xs border border-slate-200/80">
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">

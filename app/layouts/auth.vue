@@ -18,29 +18,6 @@ const { t, setLocale, isEnglish, isKhmer } = useI18n()
           </div>
           <span class="font-bold text-xs text-slate-800 tracking-tight">SMS Portal</span>
         </NuxtLink>
-
-        <div class="flex items-center border border-slate-300 rounded p-0.5 bg-white text-xs">
-          <button
-            type="button"
-            @click="setLocale('en')"
-            :class="[
-              'px-2 py-0.5 text-[11px] font-semibold rounded transition cursor-pointer',
-              isEnglish ? 'bg-indigo-600 text-white' : 'text-slate-500 hover:text-slate-800'
-            ]"
-          >
-            EN
-          </button>
-          <button
-            type="button"
-            @click="setLocale('km')"
-            :class="[
-              'px-2 py-0.5 text-[11px] font-semibold rounded transition cursor-pointer',
-              isKhmer ? 'bg-indigo-600 text-white' : 'text-slate-500 hover:text-slate-800'
-            ]"
-          >
-            ខ្មែរ
-          </button>
-        </div>
       </div>
 
       <slot />

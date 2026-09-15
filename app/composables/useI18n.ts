@@ -651,31 +651,27 @@ export const useI18n = () => {
   const isInitialized = useState<boolean>('app_locale_init', () => false)
 
   const initLocale = () => {
-    if (process.client && !isInitialized.value) {
-      const stored = localStorage.getItem(LOCALE_STORAGE_KEY) as Locale | null
-      if (stored === 'en' || stored === 'km') {
-        currentLocale.value = stored
-      } else {
-        currentLocale.value = 'en'
-      }
+    if (process.client) {
+      currentLocale.value = 'en'
+      localStorage.setItem(LOCALE_STORAGE_KEY, 'en')
       isInitialized.value = true
     }
   }
 
-  const setLocale = (locale: Locale) => {
-    currentLocale.value = locale
+  const setLocale = (_locale?: Locale) => {
+    currentLocale.value = 'en'
     if (process.client) {
-      localStorage.setItem(LOCALE_STORAGE_KEY, locale)
+      localStorage.setItem(LOCALE_STORAGE_KEY, 'en')
     }
   }
 
   const toggleLocale = () => {
-    setLocale(currentLocale.value === 'en' ? 'km' : 'en')
+    currentLocale.value = 'en'
   }
 
   const t = (key: keyof TranslationDict, params?: Record<string, string | number>): string => {
-    const dict = translations[currentLocale.value] || translations.en
-    let str = dict[key] || translations.en[key] || (key as string)
+    const dict = translations.en
+    let str = dict[key] || (key as string)
     if (params) {
       Object.entries(params).forEach(([k, v]) => {
         str = str.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v))
@@ -689,11 +685,11 @@ export const useI18n = () => {
   }
 
   return {
-    locale: currentLocale,
+    locale: computed(() => 'en'),
     setLocale,
     toggleLocale,
     t,
-    isKhmer: computed(() => currentLocale.value === 'km'),
-    isEnglish: computed(() => currentLocale.value === 'en')
+    isKhmer: computed(() => false),
+    isEnglish: computed(() => true)
   }
 }
