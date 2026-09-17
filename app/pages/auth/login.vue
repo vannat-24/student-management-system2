@@ -1,12 +1,8 @@
 <!-- pages/auth/login.vue -->
 <script setup lang="ts">
-import type { UserRole } from '~/types'
 import {
   Lock,
   User,
-  Shield,
-  GraduationCap,
-  Briefcase,
   AlertCircle,
   CheckCircle2,
   ArrowRight,
@@ -18,7 +14,7 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const { loginWithApi, rolePasswords } = useAuth()
+const { loginWithApi } = useAuth()
 const { t } = useI18n()
 const router = useRouter()
 
@@ -56,13 +52,6 @@ const handleLogin = async () => {
     isPendingWarning.value = !!result.isPending
     errorMessage.value = result.message || 'Invalid username or password.'
   }
-}
-
-// Quick fill demo accounts
-const fillDemoAccount = (uname: string, pwd: string) => {
-  username.value = uname
-  password.value = pwd
-  handleLogin()
 }
 </script>
 
@@ -153,43 +142,7 @@ const fillDemoAccount = (uname: string, pwd: string) => {
         <ArrowRight v-if="!isLoading" class="w-3.5 h-3.5" />
       </button>
 
-      <!-- Demo Quick Logins for Testing -->
-      <div class="mt-4 pt-3.5 border-t border-slate-100">
-        <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider text-center mb-2">
-          Demo Accounts
-        </div>
-        <div class="grid grid-cols-3 gap-1.5 text-[11px]">
-          <button
-            @click="fillDemoAccount('admin', rolePasswords.admin || 'admin123')"
-            type="button"
-            class="p-2 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold border border-purple-200 transition text-center cursor-pointer flex flex-col items-center gap-0.5"
-            data-tooltip="Login as Admin"
-          >
-            <Shield class="w-3.5 h-3.5" />
-            <span>Admin</span>
-          </button>
-          <button
-            @click="fillDemoAccount('sovann.teacher', rolePasswords.teacher || 'teacher123')"
-            type="button"
-            class="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold border border-indigo-200 transition text-center cursor-pointer flex flex-col items-center gap-0.5"
-            data-tooltip="Login as Teacher"
-          >
-            <Briefcase class="w-3.5 h-3.5" />
-            <span>Teacher</span>
-          </button>
-          <button
-            @click="fillDemoAccount('STU-001', rolePasswords.student || 'student123')"
-            type="button"
-            class="p-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold border border-blue-200 transition text-center cursor-pointer flex flex-col items-center gap-0.5"
-            data-tooltip="Login as Student"
-          >
-            <GraduationCap class="w-3.5 h-3.5" />
-            <span>Student</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="text-xs text-slate-500 pt-1 text-center">
+      <div class="text-xs text-slate-500 pt-2 text-center">
         {{ t('dontHaveAccount') }}
         <NuxtLink to="/auth/register" class="text-purple-600 font-bold hover:underline ml-1">
           {{ t('signUp') }}

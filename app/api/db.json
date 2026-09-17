@@ -1900,7 +1900,7 @@
       "gender": "M",
       "dob": "2004-03-21",
       "password": "student123",
-      "status": "rejected",
+      "status": "approved",
       "createdAt": "2026-09-15T03:17:56.908Z"
     }
   ],
@@ -6672,6 +6672,26 @@
       "className": "ថ្នាក់ទី ១២A (Class 12A)",
       "teacherId": "TEA-001",
       "teacherName": "លោកគ្រូ សុវណ្ណ (Mr. Sovann)",
+      "status": "approved",
+      "scores": {
+        "math": 75,
+        "physics": 75,
+        "chemistry": 75,
+        "biology": 75,
+        "khmer": 75,
+        "english": 75
+      },
+      "remarks": "សិស្សទើបត្រូវបានអនុម័តដោយ Admin"
+    },
+    {
+      "id": "STU-124",
+      "name": "ទេព វាសនា",
+      "gender": "M",
+      "dob": "2004-03-21",
+      "classId": "CLS-10B",
+      "className": "ថ្នាក់ទី ១០B (Class 10B)",
+      "teacherId": "TEA-006",
+      "teacherName": "អ្នកគ្រូ គន្ធា (Ms. Kunthea)",
       "status": "approved",
       "scores": {
         "math": 75,

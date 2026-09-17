@@ -12,7 +12,8 @@ import {
   Coffee,
   LayoutGrid,
   Table,
-  CheckCircle2
+  CheckCircle2,
+  ChevronDown
 } from 'lucide-vue-next'
 
 definePageMeta({
@@ -176,39 +177,37 @@ const printSchedule = () => {
     <!-- ========================================================= -->
     <!-- 2. CLASS SELECTOR (កាត់ដែលអាច Select បានទៅតាមថ្នាក់)        -->
     <!-- ========================================================= -->
-    <div class="no-print bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs space-y-3">
-      <div class="flex items-center justify-between text-xs text-slate-500 font-bold uppercase tracking-wider">
-        <span class="flex items-center gap-1.5">
-          <School class="w-4 h-4 text-blue-500" />
-          {{ isEnglish ? 'Select Class to View Timetable:' : 'ជ្រើសរើសថ្នាក់ដើម្បីមើលកាលវិភាគសិក្សា៖' }}
-        </span>
-        <span class="font-mono text-slate-400">({{ classes.length }} {{ isEnglish ? 'Classes' : 'ថ្នាក់រៀន' }})</span>
+    <!-- Class Selector (Select dropdown) -->
+    <div class="no-print bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0">
+          <School class="w-5 h-5" />
+        </div>
+        <div>
+          <label for="student-schedule-class-select" class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+            {{ isEnglish ? 'Select Class to View Timetable:' : 'ជ្រើសរើសថ្នាក់ដើម្បីមើលកាលវិភាគសិក្សា៖' }}
+          </label>
+          <p class="text-[11px] text-slate-400 mt-0.5">
+            {{ isEnglish ? 'Filter schedule by class' : 'ជ្រើសរើសថ្នាក់ដើម្បីបង្ហាញកាលវិភាគ' }} ({{ classes.length }} {{ isEnglish ? 'Classes' : 'ថ្នាក់រៀន' }})
+          </p>
+        </div>
       </div>
 
-      <!-- Quick Class Buttons (10A - 12B) -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-        <button
-          v-for="c in classes"
-          :key="c.id"
-          type="button"
-          @click="selectedClassId = c.id"
-          :class="[
-            'p-3 rounded-xl border text-center transition cursor-pointer flex flex-col items-center justify-center gap-1',
-            selectedClassId === c.id
-              ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-600/20 ring-2 ring-blue-600/30 font-bold'
-              : 'bg-slate-50/80 hover:bg-slate-100 text-slate-700 border-slate-200 font-semibold'
-          ]"
+      <div class="relative w-full sm:w-80">
+        <select
+          id="student-schedule-class-select"
+          v-model="selectedClassId"
+          class="w-full appearance-none bg-slate-50 hover:bg-slate-100/90 border border-slate-300 text-slate-800 text-xs font-bold rounded-xl px-3.5 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition cursor-pointer shadow-2xs"
         >
-          <span class="text-xs">{{ formatClassName(c.name, isEnglish) }}</span>
-          <span
-            :class="[
-              'text-[10px] font-mono',
-              selectedClassId === c.id ? 'text-blue-100' : 'text-slate-400'
-            ]"
+          <option
+            v-for="c in classes"
+            :key="c.id"
+            :value="c.id"
           >
-            {{ formatRoom(c.room || 'បន្ទប់ 301', isEnglish) }}
-          </span>
-        </button>
+            {{ formatClassName(c.name, isEnglish) }} — {{ formatRoom(c.room || 'បន្ទប់ 301', isEnglish) }}
+          </option>
+        </select>
+        <ChevronDown class="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
       </div>
     </div>
 
